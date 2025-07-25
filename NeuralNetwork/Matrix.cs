@@ -36,6 +36,41 @@ namespace NeuralNetwork
             return result;
         }
 
+        public static Matrix Subtract(Matrix a, Matrix b) {
+            if (a.Rows != b.Rows || a.Columns != b.Columns) {
+                throw new Exception("Matrices must have the same dimensions");
+            }
+            Matrix result = new Matrix(a.Rows, a.Columns);
+            for (int i = 0; i < a.Rows; i++)
+        }
+
+        // Element-wise multiplication
+        // used for backpropagation
+        public static Matrix HadamardProduct(Matrix a, Matrix b) {
+            if (a.Rows != b.Rows || a.Columns != b.Columns) {
+                throw new Exception("Matrices must have the same dimensions");
+            }
+            Matrix result = new Matrix(a.Rows, a.Columns);
+            for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                    result[i, j] = a[i, j] * b[i, j];
+            }
+            return result;
+        }
+
+        // Multiplies a matrix by a scalar
+        // used for backpropagation
+        public static Matrix ScalarMultiply(Matrix a, double scalar) {
+            Matrix result = new Matrix(a.Rows, a.Columns);
+            for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                    result[i, j] = a[i, j] * scalar;
+            }
+            return result;
+        }
+
         // Multiplies two matrices together (Dot Product)
         // a = the weights (rows = output neurons, cols = input neurons)
         // b = the inputs (column vector (cols = 1))
