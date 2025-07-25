@@ -24,6 +24,9 @@ namespace NeuralNetwork
 
         // Adds two matrices together
         public static Matrix Add(Matrix a, Matrix b) {
+            if (a.Rows != b.Rows || a.Columns != b.Columns) {
+                throw new Exception("Matrices must have the same dimensions");
+            }
             Matrix result = new Matrix(a.Rows, a.Columns);
             for (int i = 0; i < a.Rows; i++)
             {
@@ -37,6 +40,9 @@ namespace NeuralNetwork
         // a = the weights (rows = output neurons, cols = input neurons)
         // b = the inputs (column vector (cols = 1))
         public static Matrix DotProduct(Matrix a, Matrix b) {
+            if (a.Columns != b.Rows) {
+                throw new Exception("Number of columns in A must match number of rows in B");
+            }
             Matrix result = new Matrix(a.Rows, b.Columns);
             for (int i = 0; i < a.Rows; i++)
             {
@@ -70,10 +76,21 @@ namespace NeuralNetwork
             return result;
         }
 
-        public static Matrix Sigmoid(Matrix a) {}
-        public static Matrix ReLU(Matrix a) {}
-        public static Matrix DerivativeSigmoid(Matrix a) {}
-        public static Matrix DerivativeReLU(Matrix a) {}
+        public static Matrix Sigmoid(Matrix a) {
+            return Map(a, ActivationFunctions.Sigmoid);
+        }
+
+        public static Matrix ReLU(Matrix a) {
+            return Map(a, ActivationFunctions.ReLU);
+        }
+
+        public static Matrix DerivativeSigmoid(Matrix a) {
+            return Map(a, ActivationFunctions.SigmoidDerivative);
+        }
+
+        public static Matrix DerivativeReLU(Matrix a) {
+            return Map(a, ActivationFunctions.ReLUDerivative);
+        }
 
         public void Randomize(double min, double max) {
             Random random = new Random();
@@ -96,15 +113,17 @@ namespace NeuralNetwork
             return result;
         }
 
-        [Override]
+
         // added ToString for debugging
-        public String ToString() {
+        public override String ToString() {
             String result = "";
             for (int i = 0; i < Rows; i++)
             {
                 for (int j = 0; j < Columns; j++)
                     result += this[i, j] + " ";
+                result += "\n";
             }
+            return result;
         }
     }
 } 

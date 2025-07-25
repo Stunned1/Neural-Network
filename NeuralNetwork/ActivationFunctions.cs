@@ -14,8 +14,10 @@ namespace NeuralNetwork
             return 1 / (1 + Math.Exp(-x));
         }
 
-        public static double SigmoidDerivative(double x) { // The derivative of the sigmoid function is Sigmoid(x) * (1 - Sigmoid(x)), which is used to calculate the gradient of the sigmoid function
-            return Sigmoid(x) * (1 - Sigmoid(x));
+        // The derivative of the sigmoid function is Sigmoid(x) * (1 - Sigmoid(x)), which is used to calculate the gradient of the sigmoid function
+        // parameter x is already assumed to be the output of the sigmoid function
+        public static double SigmoidDerivative(double x) {
+            return x * (1 - x);
         }
     }
 }
