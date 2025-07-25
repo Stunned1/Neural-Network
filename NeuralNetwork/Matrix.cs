@@ -22,6 +22,7 @@ namespace NeuralNetwork
             set { data[row][col] = value; }
         }
 
+        // Adds two matrices together
         public static Matrix Add(Matrix a, Matrix b) {
             Matrix result = new Matrix(a.Rows, a.Columns);
             for (int i = 0; i < a.Rows; i++)
@@ -32,6 +33,9 @@ namespace NeuralNetwork
             return result;
         }
 
+        // Multiplies two matrices together (Dot Product)
+        // a = the weights (rows = output neurons, cols = input neurons)
+        // b = the inputs (column vector (cols = 1))
         public static Matrix DotProduct(Matrix a, Matrix b) {
             Matrix result = new Matrix(a.Rows, b.Columns);
             for (int i = 0; i < a.Rows; i++)
@@ -56,6 +60,16 @@ namespace NeuralNetwork
             return result;
         }
 
+        public static Matrix Map(Matrix a, Func<double, double> func) {
+            Matrix result = new Matrix(a.Rows, a.Columns);
+            for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                    result[i, j] = func(a[i, j]);
+            }
+            return result;
+        }
+
         public static Matrix Sigmoid(Matrix a) {}
         public static Matrix ReLU(Matrix a) {}
         public static Matrix DerivativeSigmoid(Matrix a) {}
@@ -72,5 +86,25 @@ namespace NeuralNetwork
             }
         }
 
+        public static Matrix Clone(Matrix a) {
+            Matrix result = new Matrix(a.Rows, a.Columns);
+            for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                    result[i, j] = a[i, j];
+            }
+            return result;
+        }
+
+        [Override]
+        // added ToString for debugging
+        public String ToString() {
+            String result = "";
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Columns; j++)
+                    result += this[i, j] + " ";
+            }
+        }
     }
 } 
