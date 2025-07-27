@@ -42,6 +42,11 @@ namespace NeuralNetwork
             }
             Matrix result = new Matrix(a.Rows, a.Columns);
             for (int i = 0; i < a.Rows; i++)
+            {
+                for (int j = 0; j < a.Columns; j++)
+                    result[i, j] = a[i, j] - b[i, j];
+            }
+            return result;
         }
 
         // Element-wise multiplication
@@ -69,6 +74,11 @@ namespace NeuralNetwork
                     result[i, j] = a[i, j] * scalar;
             }
             return result;
+        }
+
+        // Multiplies a matrix by a scalar (alias for ScalarMultiply for convenience)
+        public static Matrix Multiply(Matrix a, double scalar) {
+            return ScalarMultiply(a, scalar);
         }
 
         // Multiplies two matrices together (Dot Product)

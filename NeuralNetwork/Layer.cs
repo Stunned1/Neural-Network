@@ -9,6 +9,11 @@ namespace NeuralNetwork
         private Func<Matrix, Matrix> activationFunction;
         private Func<Matrix, Matrix> activationFunctionDerivative;
 
+        //variables for backpropagation
+        private Matrix input;
+        private Matrix weightedSum;
+        private Matrix activation;
+
         public Layer(int inputSize, int outputSize, 
                     Func<Matrix, Matrix> activationFunction, 
                     Func<Matrix, Matrix> activationFunctionDerivative)
@@ -22,10 +27,24 @@ namespace NeuralNetwork
         }
 
         public Matrix ForwardPass(Matrix input) {
-            Matrix output = Matrix.DotProduct(input, weights);
-            output = Matrix.Add(output, biases);
-            output = activationFunction(output);
-            return output;
+            this.input = input;
+            this.weightedSum = Matrix.DotProduct(weights, input);
+            this.weightedSum = Matrix.Add(weightedSum, biases);
+            this.activation = activationFunction(weightedSum);
+            return activation;
+        }
+
+        public Matrix Backprop(Matrix error, double learningRate) {
+            Matrix derivedActivation = activationFunctionDerivative(activation);
+            Matrix delta = Matrix.HadamardProduct(error, derivedActivation);
+
+            Matrix weightGradient = Matrix.DotProduct(delta, input.Transpose());
+
+            weights = Matrix.Subtract(weights, Matrix.ScalarMultiply(weightGradient, learningRate));
+            biases = Matrix.Subtract(biases, Matrix.ScalarMultiply(delta, learningRate));
+
+            Matrix errorToPreviousLayer = Matrix.DotProduct(delta, weights.Transpose());
+            return errorToPreviousLayer;
         }
 
 
