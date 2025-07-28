@@ -2,6 +2,87 @@ namespace NeuralNetwork
 {
     public class NeuralNetwork
     {
+        private List<Layer> layers;
+        private double learningRate;
+        private Func<Matrix, Matrix, double> lossFunction;
+        private Func<Matrix, Matrix, Matrix> lossFunctionDerivative;
+        private List<(Func<Matrix, Matrix> activationFunction, Func<Matrix, Matrix> activationFunctionDerivative)> activationFunctions;
+
+
+        public NeuralNetwork(List<int> layerSizes, 
+                            double learningRate, 
+                            Func<Matrix, Matrix, double> lossFunction, 
+                            Func<Matrix, Matrix, Matrix> lossFunctionDerivative,
+                            List<(Func<Matrix, Matrix> activationFunction, Func<Matrix, Matrix> activationFunctionDerivative)> activationFunctions
+                            ) {
+            this.layers = new List<Layer>();
+            this.learningRate = learningRate;
+            this.lossFunction = lossFunction;
+            this.lossFunctionDerivative = lossFunctionDerivative;
+            this.activationFunctions = activationFunctions;
+
+            for (int i = 0; i < layerSizes.Count - 1; i++) {
+                int inputSize = layerSizes[i];
+                int outputSize = layerSizes[i + 1];
+                layers.Add(new Layer(inputSize, outputSize, activationFunctions[i].activationFunction, activationFunctions[i].activationFunctionDerivative));
+            }
+        }
+
+        public Matrix ForwardPass(Matrix input) {
+            Matrix currentInput = input;
+            foreach (Layer layer in layers) {
+                currentInput = layer.ForwardPass(currentInput);
+            }
+            return currentInput;
+        }
+
+        public void Train(Matrix input, Matrix expectedOutput) {
+            Matrix predictedOutput = ForwardPass(input);
+            double loss = lossFunction(predictedOutput, expectedOutput);
+            Matrix error = lossFunctionDerivative(predictedOutput, expectedOutput);
+            for (int i = layers.Count - 1; i >= 0; i--) {
+                error = layers[i].Backprop(error, learningRate);
+            }
+            Console.WriteLine($"Loss: {loss:F10}");
+        }
+
+        public void TrainBatch(List<Matrix> inputs, List<Matrix> expectedOutputs) { //simple batch training; could be improved with more sophisticated batching (e.g. stochastic gradient descent)
+            for (int i = 0; i < inputs.Count; i++) {
+                Train(inputs[i], expectedOutputs[i]);
+            }
+        }
+
+        public static void Shuffle<T>(List<T> list) {
+            Random random = new Random();
+            int n = list.Count;
+            while (n > 1) {
+                n--;
+                int k = random.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
+        //train for one epoch
+        //could be improved with more sophisticated epoch training (e.g. mini-batch training)
+        public void TrainEpoch(List<Matrix> inputs, List<Matrix> expectedOutputs) {
+
+            if (inputs.Count != expectedOutputs.Count) {
+                throw new Exception("Inputs and expected outputs must have the same number of elements");
+            }
+
+            List<int> indices = Enumerable.Range(0, inputs.Count).ToList(); //Generate list of indices to shuffle while preserving input-output pairing
+            Shuffle(indices);
+
+            List<Matrix> shuffledInputs = new List<Matrix>();
+            List<Matrix> shuffledExpectedOutputs = new List<Matrix>();
+            for (int i = 0; i < indices.Count; i++) {
+                shuffledInputs.Add(inputs[indices[i]]);
+                shuffledExpectedOutputs.Add(expectedOutputs[indices[i]]);
+            }
+            TrainBatch(shuffledInputs, shuffledExpectedOutputs);
+        }
 
     }
 }

@@ -1,4 +1,5 @@
 namespace NeuralNetwork
+using System;
 {
     public static class ActivationFunctions
     {

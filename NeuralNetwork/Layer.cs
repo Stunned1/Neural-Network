@@ -35,8 +35,8 @@ namespace NeuralNetwork
         }
 
         public Matrix Backprop(Matrix error, double learningRate) {
-            Matrix derivedActivation = activationFunctionDerivative(activation);
-            Matrix delta = Matrix.HadamardProduct(error, derivedActivation);
+            Matrix activationDerivative = activationFunctionDerivative(activation);
+            Matrix delta = Matrix.HadamardProduct(error, activationDerivative);
 
             Matrix weightGradient = Matrix.DotProduct(delta, input.Transpose());
 
