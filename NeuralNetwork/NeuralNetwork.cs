@@ -35,9 +35,9 @@ namespace NeuralNetwork
         private int ArgMax(Matrix matrix) {
             double max = matrix[0, 0];
             int maxIndex = 0;
-            for (int i = 0; i < matrix.Columns; i++) {
-                if (matrix[0, i] > max) {
-                    max = matrix[0, i];
+            for (int i = 0; i < matrix.Rows; i++) {
+                if (matrix[i, 0] > max) {
+                    max = matrix[i, 0];
                     maxIndex = i;
                 }
             }

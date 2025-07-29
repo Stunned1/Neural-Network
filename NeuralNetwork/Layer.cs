@@ -24,9 +24,6 @@ namespace NeuralNetwork
             this.biases.Randomize(-1, 1);
             this.activationFunction = activationFunction;
             this.activationFunctionDerivative = activationFunctionDerivative;
-            this.input = new Matrix(inputSize, 1); //temporary variables for backpropagation
-            this.weightedSum = new Matrix(outputSize, 1); //temporary variables for backpropagation
-            this.activation = new Matrix(outputSize, 1); //temporary variables for backpropagation
         }
 
         public Matrix ForwardPass(Matrix input) {
@@ -46,7 +43,7 @@ namespace NeuralNetwork
             weights = Matrix.Subtract(weights, Matrix.ScalarMultiply(weightGradient, learningRate));
             biases = Matrix.Subtract(biases, Matrix.ScalarMultiply(delta, learningRate));
 
-            Matrix errorToPreviousLayer = Matrix.DotProduct(delta, Matrix.Transpose(weights));
+            Matrix errorToPreviousLayer = Matrix.DotProduct(Matrix.Transpose(weights), delta);
             return errorToPreviousLayer;
         }
 

@@ -26,7 +26,7 @@ using NeuralNetwork;
 
             var (trainingData, trainingLabels) = LoadMNIST.LoadMnistData("data/mnist_train.csv", 1000);
             var (testData, testLabels) = LoadMNIST.LoadMnistData("data/mnist_test.csv", 200);
-
+            
             Console.WriteLine("Starting training...");
             for (int epoch = 0; epoch < 10; epoch++) {
                 Console.WriteLine($"Epoch {epoch + 1}/10");
