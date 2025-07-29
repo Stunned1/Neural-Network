@@ -1,1 +1,14 @@
-data/*
+# Data files
+data/
+
+# Build outputs
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.cache
+*.pdb
+*.log
