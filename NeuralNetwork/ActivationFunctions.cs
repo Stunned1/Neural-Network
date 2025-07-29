@@ -1,5 +1,5 @@
-namespace NeuralNetwork
 using System;
+namespace NeuralNetwork
 {
     public static class ActivationFunctions
     {

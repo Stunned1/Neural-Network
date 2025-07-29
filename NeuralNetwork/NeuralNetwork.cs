@@ -1,3 +1,7 @@
+using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 namespace NeuralNetwork
 {
     public class NeuralNetwork
@@ -28,12 +32,58 @@ namespace NeuralNetwork
             }
         }
 
+        private int ArgMax(Matrix matrix) {
+            double max = matrix[0, 0];
+            int maxIndex = 0;
+            for (int i = 0; i < matrix.Columns; i++) {
+                if (matrix[0, i] > max) {
+                    max = matrix[0, i];
+                    maxIndex = i;
+                }
+            }
+            return maxIndex;
+        }
+
+        public void Save(string path) {
+            using (StreamWriter writer = new StreamWriter(path)) {
+                writer.WriteLine(learningRate);
+                writer.WriteLine(layers.Count);
+                foreach (Layer layer in layers) {
+                    Matrix.Serialize(layer.GetWeights(), writer);
+                    Matrix.Serialize(layer.GetBiases(), writer);
+                }
+            }
+        }
+
+        public void Load(string path, List<(Func<Matrix, Matrix>, Func<Matrix, Matrix>)> activationFunctions) {
+            layers.Clear();
+            using (StreamReader reader = new StreamReader(path)) {
+                learningRate = double.Parse(reader.ReadLine());
+                int numLayers = int.Parse(reader.ReadLine());
+
+                for (int i = 0; i < numLayers; i++) {
+                    Matrix weights = Matrix.Deserialize(reader);
+                    Matrix biases = Matrix.Deserialize(reader);
+
+                    var (activation, activationPrime) = activationFunctions[i];
+                    Layer layer = new Layer(weights.Columns, weights.Rows, activation, activationPrime); 
+                    layer.SetWeights(weights);
+                    layer.SetBiases(biases);
+                    layers.Add(layer);
+                }
+            }
+        }
+
         public Matrix ForwardPass(Matrix input) {
             Matrix currentInput = input;
             foreach (Layer layer in layers) {
                 currentInput = layer.ForwardPass(currentInput);
             }
             return currentInput;
+        }
+
+        public Matrix Predict(Matrix input) { //for convenience; could be removed if not needed (same as ForwardPass). more could be added later too
+            return ForwardPass(input);
         }
 
         public void Train(Matrix input, Matrix expectedOutput) {
@@ -82,6 +132,20 @@ namespace NeuralNetwork
                 shuffledExpectedOutputs.Add(expectedOutputs[indices[i]]);
             }
             TrainBatch(shuffledInputs, shuffledExpectedOutputs);
+        }
+
+        public double EvaluateAccuracy(List<Matrix> inputs, List<Matrix> expectedOutputs) {
+            int correct = 0;
+            for (int i = 0; i < inputs.Count; i++) {
+                Matrix predictedOutput = ForwardPass(inputs[i]);
+
+                int predictedIndex = ArgMax(predictedOutput);
+                int expectedIndex = ArgMax(expectedOutputs[i]);
+                if (predictedIndex == expectedIndex) {
+                    correct++;
+                }
+            }
+            return (double)correct / inputs.Count;
         }
 
     }

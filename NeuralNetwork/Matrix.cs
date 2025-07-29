@@ -170,5 +170,29 @@ namespace NeuralNetwork
             }
             return result;
         }
+
+        public static void Serialize(Matrix a, StreamWriter writer) {
+            writer.WriteLine(a.Rows);
+            writer.WriteLine(a.Columns);
+            for (int i = 0; i < a.Rows; i++) {
+                for (int j = 0; j < a.Columns; j++) {
+                    writer.Write(a[i, j] + " ");
+                }
+                writer.WriteLine();
+            }
+        }
+
+        public static Matrix Deserialize(StreamReader reader) {
+            int rows = int.Parse(reader.ReadLine());
+            int columns = int.Parse(reader.ReadLine());
+            Matrix result = new Matrix(rows, columns);
+            for (int i = 0; i < rows; i++) {
+                string[] line = reader.ReadLine().Split(' ');
+                for (int j = 0; j < columns; j++) {
+                    result[i, j] = double.Parse(line[j]);
+                }
+            }
+            return result;
+        }
     }
 } 
