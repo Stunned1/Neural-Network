@@ -14,11 +14,15 @@ namespace NeuralNetwork
             
             using (var reader = new StreamReader(filePath))
             {
-                // Skip header if it exists
+                //FIX: 7.29 Fixed header detection logic - was backwards
                 string firstLine = reader.ReadLine();
                 bool hasHeader = !char.IsDigit(firstLine[0]);
                 
-                if (!hasHeader)
+                if (hasHeader)
+                {
+                    // Skip header line
+                }
+                else
                 {
                     // No header, process the first line
                     ProcessLine(firstLine, inputs, labels);

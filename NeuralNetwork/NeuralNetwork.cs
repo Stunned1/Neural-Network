@@ -89,6 +89,13 @@ namespace NeuralNetwork
         public void Train(Matrix input, Matrix expectedOutput) {
             Matrix predictedOutput = ForwardPass(input);
             double loss = lossFunction(predictedOutput, expectedOutput);
+            
+            //FIX: 7.29 Added debug output to see what network is predicting
+            if (loss > 0.199 && loss < 0.201) {
+                Console.WriteLine($"Debug - Predicted: [{predictedOutput[0,0]:F3}, {predictedOutput[1,0]:F3}, {predictedOutput[2,0]:F3}, ...]");
+                Console.WriteLine($"Debug - Expected: [{expectedOutput[0,0]:F3}, {expectedOutput[1,0]:F3}, {expectedOutput[2,0]:F3}, ...]");
+            }
+            
             Matrix error = lossFunctionDerivative(predictedOutput, expectedOutput);
             for (int i = layers.Count - 1; i >= 0; i--) {
                 error = layers[i].Backprop(error, learningRate);
@@ -102,12 +109,14 @@ namespace NeuralNetwork
             }
         }
 
+        //FIX: 7.29 Fixed random number generator - use static instance to avoid same seed issue
+        private static Random shuffleRandom = new Random();
+        
         public static void Shuffle<T>(List<T> list) {
-            Random random = new Random();
             int n = list.Count;
             while (n > 1) {
                 n--;
-                int k = random.Next(n + 1);
+                int k = shuffleRandom.Next(n + 1);
                 T value = list[k];
                 list[k] = list[n];
                 list[n] = value;

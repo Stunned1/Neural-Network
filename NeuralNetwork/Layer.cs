@@ -20,8 +20,9 @@ namespace NeuralNetwork
         {
             this.weights = new Matrix(outputSize, inputSize);
             this.biases = new Matrix(outputSize, 1);
-            this.weights.Randomize(-1, 1);
-            this.biases.Randomize(-1, 1);
+            //FIX: 7.29 Smaller weight initialization to prevent sigmoid saturation
+            this.weights.Randomize(-0.1, 0.1);
+            this.biases.Randomize(-0.1, 0.1);
             this.activationFunction = activationFunction;
             this.activationFunctionDerivative = activationFunctionDerivative;
         }
@@ -35,7 +36,8 @@ namespace NeuralNetwork
         }
 
         public Matrix Backprop(Matrix error, double learningRate) {
-            Matrix activationDerivative = activationFunctionDerivative(activation);
+            //FIX: 7.29 Fixed backpropagation - compute derivative on weightedSum, not activation
+            Matrix activationDerivative = activationFunctionDerivative(weightedSum);
             Matrix delta = Matrix.HadamardProduct(error, activationDerivative);
 
             Matrix weightGradient = Matrix.DotProduct(delta, Matrix.Transpose(input));

@@ -4,8 +4,12 @@ namespace NeuralNetwork
 {
     public static class ActivationFunctions
     {
+        //FIX: 7.29 Fixed sigmoid to prevent numerical overflow
         public static double Sigmoid(double x)
         {
+            // Clamp x to prevent overflow
+            if (x > 500) return 1.0;
+            if (x < -500) return 0.0;
             return 1.0 / (1.0 + Math.Exp(-x));
         }
 

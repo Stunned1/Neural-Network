@@ -19,19 +19,19 @@ using NeuralNetwork;
 
             var network = new NeuralNetwork.NeuralNetwork(
                 layerSizes, 
-                0.0001, //much lower learning rate for stability
-                LossFunctions.MeanSquaredError, //back to MSE for now
-                LossFunctions.MeanSquaredErrorDerivative, //MSE derivative
-                activations //activation functions
+                0.001, 
+                LossFunctions.MeanSquaredError, 
+                LossFunctions.MeanSquaredErrorDerivative, 
+                activations 
             );
 
-            var (trainingData, trainingLabels) = LoadMNIST.LoadMnistData("data/mnist_train.csv", 3000); //reduced data size
-            var (testData, testLabels) = LoadMNIST.LoadMnistData("data/mnist_test.csv", 500); //reduced test size
+            var (trainingData, trainingLabels) = LoadMNIST.LoadMnistData("data/mnist_train.csv"); 
+            var (testData, testLabels) = LoadMNIST.LoadMnistData("data/mnist_test.csv"); 
             
             Console.WriteLine($"Training on {trainingData.Count} samples, testing on {testData.Count} samples");
             Console.WriteLine("Starting training...");
             
-            for (int epoch = 0; epoch < 10; epoch++) { //reduced epochs
+            for (int epoch = 0; epoch < 20; epoch++) { 
                 Console.WriteLine($"Epoch {epoch + 1}/10");
                 network.TrainEpoch(trainingData, trainingLabels);
                 

@@ -137,8 +137,10 @@ namespace NeuralNetwork
             return Map(a, ActivationFunctions.ReLUDerivative);
         }
 
+        //FIX: 7.29 Fixed random number generator - use static instance to avoid same seed issue
+        private static Random random = new Random();
+        
         public void Randomize(double min, double max) {
-            Random random = new Random();
             for (int i = 0; i < Rows; i++)
             {
                 for (int j = 0; j < Columns; j++)
