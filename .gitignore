@@ -12,3 +12,6 @@ obj/
 *.cache
 *.pdb
 *.log
+
+# Model files
+trained_model.txt

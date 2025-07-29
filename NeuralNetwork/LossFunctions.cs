@@ -22,5 +22,22 @@ namespace NeuralNetwork
             Matrix gradient = Matrix.ScalarMultiply(diff, scalar);
             return gradient;
         }
+
+        // Cross-Entropy Loss for classification (much better than MSE)
+        public static double CrossEntropyLoss(Matrix predicted, Matrix actual) {
+            double sum = 0;
+            for (int i = 0; i < predicted.Rows; i++) {
+                for (int j = 0; j < predicted.Columns; j++) {
+                    double pred = Math.Max(1e-15, Math.Min(1 - 1e-15, predicted[i, j])); // Clamp to avoid log(0)
+                    sum -= actual[i, j] * Math.Log(pred);
+                }
+            }
+            return sum;
+        }
+
+        public static Matrix CrossEntropyLossDerivative(Matrix predicted, Matrix actual) {
+            // For softmax + cross-entropy, the derivative is simply (predicted - actual)
+            return Matrix.Subtract(predicted, actual);
+        }
     }
 }
