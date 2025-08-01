@@ -31,20 +31,33 @@ using NeuralNetwork;
             Console.WriteLine($"Training on {trainingData.Count} samples, testing on {testData.Count} samples");
             Console.WriteLine("Starting training...");
             
+            // Performance tracking
+            var trainingAccuracies = new List<double>();
+            var testAccuracies = new List<double>();
+            var losses = new List<double>();
+            
             for (int epoch = 0; epoch < 20; epoch++) { 
-                Console.WriteLine($"Epoch {epoch + 1}/10");
-                network.TrainEpoch(trainingData, trainingLabels);
+                Console.WriteLine($"\nEpoch {epoch + 1}/20");
                 
-                // Evaluate on test data every 2 epochs
-                if ((epoch + 1) % 2 == 0) {
-                    double accuracy = network.EvaluateAccuracy(testData, testLabels);
-                    Console.WriteLine($"Test Accuracy: {accuracy:P2}");
-                }
+                // Train and get loss
+                double epochLoss = network.TrainEpoch(trainingData, trainingLabels);
+                losses.Add(epochLoss);
+                
+                // Calculate training accuracy
+                double trainAccuracy = network.EvaluateAccuracy(trainingData, trainingLabels);
+                trainingAccuracies.Add(trainAccuracy);
+                
+                // Calculate test accuracy
+                double testAccuracy = network.EvaluateAccuracy(testData, testLabels);
+                testAccuracies.Add(testAccuracy);
+                
+                // Live performance visualization
+                DisplayPerformanceVisualization(epoch + 1, 20, trainAccuracy, testAccuracy, epochLoss, trainingAccuracies, testAccuracies, losses);
             }
 
             // Final evaluation
             double finalAccuracy = network.EvaluateAccuracy(testData, testLabels);
-            Console.WriteLine($"Final Test Accuracy: {finalAccuracy:P2}");
+            Console.WriteLine($"\nFinal Test Accuracy: {finalAccuracy:P2}");
 
             // Test prediction on first image
             Matrix testImage = testData[0];
@@ -72,5 +85,32 @@ using NeuralNetwork;
             network.Save("trained_model.txt");
             Console.WriteLine("Model saved to trained_model.txt");
 
+        }
+        
+        static void DisplayPerformanceVisualization(int currentEpoch, int totalEpochs, double trainAcc, double testAcc, double loss, List<double> trainHistory, List<double> testHistory, List<double> lossHistory)
+        {
+            // Clear previous lines
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.Write(new string(' ', Console.WindowWidth - 1));
+            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            
+            // Progress bar
+            int progressBarWidth = 30;
+            int filledWidth = (int)((double)currentEpoch / totalEpochs * progressBarWidth);
+            string progressBar = "[" + new string('█', filledWidth) + new string('░', progressBarWidth - filledWidth) + "]";
+            
+            Console.WriteLine($"Progress: {progressBar} {currentEpoch}/{totalEpochs}");
+            Console.WriteLine($"Loss: {loss:F4} | Train Acc: {trainAcc:P2} | Test Acc: {testAcc:P2}");
+            
+            // Simple trend indicators
+            if (trainHistory.Count > 1)
+            {
+                string trainTrend = trainAcc > trainHistory[trainHistory.Count - 2] ? "↗" : "↘";
+                string testTrend = testAcc > testHistory[testHistory.Count - 2] ? "↗" : "↘";
+                Console.WriteLine($"Trends: Train {trainTrend} | Test {testTrend}");
+            }
+            
+            // Performance summary
+            Console.WriteLine($"Best Test Accuracy: {testHistory.Max():P2} | Best Train Accuracy: {trainHistory.Max():P2}");
         }
     }

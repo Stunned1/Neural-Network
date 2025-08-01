@@ -90,17 +90,10 @@ namespace NeuralNetwork
             Matrix predictedOutput = ForwardPass(input);
             double loss = lossFunction(predictedOutput, expectedOutput);
             
-            //FIX: 7.29 Added debug output to see what network is predicting
-            if (loss > 0.199 && loss < 0.201) {
-                Console.WriteLine($"Debug - Predicted: [{predictedOutput[0,0]:F3}, {predictedOutput[1,0]:F3}, {predictedOutput[2,0]:F3}, ...]");
-                Console.WriteLine($"Debug - Expected: [{expectedOutput[0,0]:F3}, {expectedOutput[1,0]:F3}, {expectedOutput[2,0]:F3}, ...]");
-            }
-            
             Matrix error = lossFunctionDerivative(predictedOutput, expectedOutput);
             for (int i = layers.Count - 1; i >= 0; i--) {
                 error = layers[i].Backprop(error, learningRate);
             }
-            Console.WriteLine($"Loss: {loss:F10}");
         }
 
         public void TrainBatch(List<Matrix> inputs, List<Matrix> expectedOutputs) { //simple batch training; could be improved with more sophisticated batching (e.g. stochastic gradient descent)
@@ -125,7 +118,7 @@ namespace NeuralNetwork
 
         //train for one epoch
         //could be improved with more sophisticated epoch training (e.g. mini-batch training)
-        public void TrainEpoch(List<Matrix> inputs, List<Matrix> expectedOutputs) {
+        public double TrainEpoch(List<Matrix> inputs, List<Matrix> expectedOutputs) {
 
             if (inputs.Count != expectedOutputs.Count) {
                 throw new Exception("Inputs and expected outputs must have the same number of elements");
@@ -140,7 +133,19 @@ namespace NeuralNetwork
                 shuffledInputs.Add(inputs[indices[i]]);
                 shuffledExpectedOutputs.Add(expectedOutputs[indices[i]]);
             }
+            
+            // Calculate average loss for the epoch
+            double totalLoss = 0.0;
+            for (int i = 0; i < shuffledInputs.Count; i++) {
+                Matrix predictedOutput = ForwardPass(shuffledInputs[i]);
+                totalLoss += lossFunction(predictedOutput, shuffledExpectedOutputs[i]);
+            }
+            double averageLoss = totalLoss / shuffledInputs.Count;
+            
+            // Train the batch
             TrainBatch(shuffledInputs, shuffledExpectedOutputs);
+            
+            return averageLoss;
         }
 
         public double EvaluateAccuracy(List<Matrix> inputs, List<Matrix> expectedOutputs) {
